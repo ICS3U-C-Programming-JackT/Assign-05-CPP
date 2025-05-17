@@ -24,51 +24,44 @@ const char* TUTORIAL[] = {
     "There's a 1 in 4 chance to lose your bet.",
     "You can buy buffs to reduce your odds of losing or manipulate the outcome.",
     "Winning adds cash. Losing subtracts a lot more.",
-    "Spend wisely, bet strategically."};
+    "Spend wisely, bet strategically."
+};
 const int TUTORIAL_SIZE = sizeof(TUTORIAL) / sizeof(TUTORIAL[0]);
 
 const int DIALOGUE_TIMINGS[] = {
-    1, 1, 3, 4, 3, 5, 4, 3, 2, 5};
+    1, 2, 3, 4, 5
+};
 const int DIALOGUE_TIMINGS_SIZE = sizeof(DIALOGUE_TIMINGS) / sizeof(DIALOGUE_TIMINGS[0]);
-
 const char* DIALOGUE_LINES[] = {
     "The dealer eyes you up and down, ready to spin the wheel.",
     "A hush falls over the table as you place your bet.",
-    "You feel a twinge in your gut. Something's off this round.",
-    "The wheel groans louder than before — like it knows your odds.",
-    "Your hands shake as the stack of cash gets smaller.",
-    "Every click of the wheel hits like a heartbeat in your skull.",
-    "A cold breeze drifts in. You swear you see the dealer grin.",
     "You feel your luck's about to shift. You just don't know which way.",
-    "It's too quiet. Like the room's holding its breath.",
-    "You're one bet away from something — you just don't know what."};
+    "Every click of the wheel hits like a heartbeat in your skull.",
+    "You're one bet away from something — you just don't know what."
+};
 const int DIALOGUE_LINES_SIZE = sizeof(DIALOGUE_LINES) / sizeof(DIALOGUE_LINES[0]);
 
 const char* ITEM_NAMES[] = {
     "Loaded Dice",
     "Fortune's Favor",
     "Echo Bet"};
-
 const char* ITEM_EFFECTS[] = {
     "Avoid a number of your choice.",
     "50% chance to re-spin if you lose.",
     "If you win, win again for free."};
-
 const char* ITEM_DESCRIPTIONS[] = {
     "Tampered and twisted. Luck has a favorite tonight.",
     "She's watching you. Just this once.",
     "A whisper in time. A second chance disguised as déjà vu."};
-
 const float ITEM_PRICE_FRACTIONS[] = {
     0.10f,
     0.15f,
-    0.40f};
-
+    0.40f
+};
 const char* ITEM_ACTIVATION_LINES[] = {
     "The dice hum softly. Reality tips in your favor.",
     "A second chance stirs behind the curtain.",
     "The win echoes — once more, just like before."};
-
 const int ITEM_COUNT = sizeof(ITEM_NAMES) / sizeof(ITEM_NAMES[0]);
 
 const int WHEEL_MAX = 4;
