@@ -14,7 +14,7 @@
 #include <vector>
 
 const std::string CONTINUE_MSG = "Press enter to continue:";
-const std::string STARTING_MSG = "You've entered a world where chance is king and risk is the price of power. Start with a modest sum and claw your way to $1000, and bend fortune to your will... If it doesn't break you first…";
+const std::string STARTING_MSG = "You've entered a world where chance is king and risk is the price of power.\nStart with a modest sum, claw your way to $1000, and bend fortune to your will...\nIf it doesn't break you first…";
 
 const char* TUTORIAL[] = {
     "You start with a fixed amount of money.",
@@ -176,12 +176,21 @@ int roulette(int bet, const std::string& item) {
 }
 
 // === Game Loop ===
-void game() {
+bool game() {
     redraw_terminal();
     int userMoney = 100;
     bool gameWon = true;
 
     while (true) {
+        if (userMoney >= 1000) {
+            gameWon = true;
+            break;
+        }
+        if (userMoney <= 0) {
+            gameWon = false;
+            break;
+        }
+
         int intensity = 1;
         if (userMoney > 800) {
             intensity = 5;
@@ -196,10 +205,58 @@ void game() {
         c_print(dialogue, "gray");
         c_print("\nYour current money: "+ std::to_string(userMoney),"cyan");
 
-        std::string betString;
+        std::string visitShop;
+        c_print("\nDo you want to visit the shop before placing your bet? (y/n)", "yellow");
+        std::cin >> visitShop;
 
-        c_print("\nPlace your bet: ","cyan");
-        std::cin >> betString;
+        std::string item = "N/A";
+
+        if (visitShop == "y") {
+            item = open_shop(userMoney);
+        } else {
+            c_print("You ignore the strange merchant lingering in the corner...", "gray");
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+        }
+
+        try {
+            redraw_terminal();
+            c_print(dialogue, "gray");
+            c_print("\nYour current money: " + std::to_string(userMoney), "cyan");
+
+            std::string betString;
+            int betInt;
+
+            c_print("\nPlace your bet: ", "yellow");
+            std::cin >> betString;
+
+            if (betString == "EzWin") {
+                userMoney = 1000;
+            } else if (betString == "LoseGame") {
+                userMoney = -1;
+            } else if (betString == "Boost") {
+                userMoney += 300;
+            } else {
+                betInt = std::stoi(betString);
+
+                if (betInt<0 || betInt>userMoney) {
+                    throw std::runtime_error("Bet must be from 0 to your total money.");
+                } else {
+                    int earnings = roulette(betInt, item);
+                    userMoney += earnings;
+                }
+            }
+        } catch (std::invalid_argument) {
+            c_print("Warning: Invalid input detected!", "red");
+        }
+    }
+    std::string retry;
+    c_print("Play again? (y/n): ","yellow");
+    std::cin >> retry;
+
+    if (retry == "y") {
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -211,7 +268,7 @@ void tutorial() {
     std::cin >>doTutorial;
     if (doTutorial == "y") {
         for (int msg = 1; msg < TUTORIAL_SIZE; msg++) {
-            c_print(std::string(TUTORIAL[msg]), "white");
+            c_print(std::string(TUTORIAL[msg])+"\n", "white");
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     } else {
@@ -231,6 +288,12 @@ void tutorial() {
 // === Main Entry ===
 int main() {
     tutorial();
-    game();
+    bool retry = true;
+    while (retry == true) {
+        retry = game();
+    }
+    c_print("Farewell friend, may the odds be forever in your favour", "gray");
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    c_print("And remember, 99% of gamblers quit before they win big...", "gray");
     return 0;
 }
