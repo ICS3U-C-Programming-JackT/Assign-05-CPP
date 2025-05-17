@@ -120,7 +120,7 @@ void c_print(const std::string text, const std::string color) {
     }
 
     std::cout << "\033[38;2;" << r << ";" << g << ";" << b << "m"
-              << text << "\033[0m";
+              << text << "\033[0m"<< std::flush;
 }
 
 // === Redraw Terminal ===
@@ -178,26 +178,27 @@ int roulette(int bet, const std::string& item) {
 // === Game Loop ===
 void game() {
     redraw_terminal();
-    int user_money = 100;
-    bool game_won = true;
+    int userMoney = 100;
+    bool gameWon = true;
 
     while (true) {
         int intensity = 1;
-        if (user_money > 800) {
+        if (userMoney > 800) {
             intensity = 5;
-        } else if (user_money > 500) {
+        } else if (userMoney > 500) {
             intensity = 4;
-        } else if (user_money > 300) {
+        } else if (userMoney > 300) {
             intensity = 3;
         } else {
             intensity = 2;
         }
         std::string dialogue = DIALOGUE_LINES[intensity - 1];
         c_print(dialogue, "gray");
+        c_print("\nYour current money: "+ std::to_string(userMoney),"cyan");
 
         std::string betString;
 
-        std::cout << "\nPlace your bet: ";
+        c_print("\nPlace your bet: ","cyan");
         std::cin >> betString;
     }
 }
@@ -210,7 +211,7 @@ void tutorial() {
     std::cin >>doTutorial;
     if (doTutorial == "y") {
         for (int msg = 1; msg < TUTORIAL_SIZE; msg++) {
-            c_print("\n" + std::string(TUTORIAL[msg]), "white");
+            c_print(std::string(TUTORIAL[msg]), "white");
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     } else {
