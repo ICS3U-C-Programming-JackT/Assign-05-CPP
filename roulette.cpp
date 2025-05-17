@@ -14,7 +14,6 @@
 #include <vector>
 
 const std::string CONTINUE_MSG = "Press enter to continue:";
-
 const std::string STARTING_MSG = "You've entered a world where chance is king and risk is the price of power. Start with a modest sum and claw your way to $1000, and bend fortune to your will... If it doesn't break you first…";
 
 const char* TUTORIAL[] = {
@@ -121,13 +120,13 @@ void c_print(const std::string text, const std::string color) {
     }
 
     std::cout << "\033[38;2;" << r << ";" << g << ";" << b << "m"
-              << text << "\033[0m" << std::endl;
+              << text << "\033[0m";
 }
 
 // === Redraw Terminal ===
 void redraw_terminal() {
     system("clear");
-    c_print("--------JackRoulette--------", "white");
+    c_print("\n--------JackRoulette--------\n", "white");
 }
 
 // === Prompt Continue ===
@@ -143,6 +142,7 @@ void item_activate(const std::string& item) {
 // === Shop ===
 std::string open_shop(int user_money) {
     //Empty
+    return "a";
 }
 
 // === Roulette Spin ===
@@ -192,23 +192,29 @@ void game() {
         } else {
             intensity = 2;
         }
+        std::string dialogue = DIALOGUE_LINES[intensity - 1];
+        c_print(dialogue, "gray");
+
+        std::string betString;
+
+        std::cout << "\nPlace your bet: ";
+        std::cin >> betString;
     }
 }
 
 void tutorial() {
-    c_print(STARTING_MSG,"cyan");
+    c_print(STARTING_MSG+"\n","cyan");
     std::string doTutorial;
 
     c_print("Would you like a tutorial? (y/n):", "yellow");
     std::cin >>doTutorial;
-
     if (doTutorial == "y") {
         for (int msg = 1; msg < TUTORIAL_SIZE; msg++) {
-            c_print(TUTORIAL[msg], "white");
+            c_print("\n" + std::string(TUTORIAL[msg]), "white");
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     } else {
-        c_print("Let's get this party started!", "green");
+        c_print("Let's get this party started!\n", "green");
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     c_print("Traveling to the casino","purple");
@@ -217,7 +223,7 @@ void tutorial() {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     c_print(".", "purple");
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    c_print(".", "purple");
+    c_print(".\n", "purple");
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
