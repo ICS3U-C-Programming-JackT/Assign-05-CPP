@@ -4,6 +4,7 @@
 // Date: May 17, 2025
 // Roulette game in C++
 
+#include <cctype>
 #include <chrono>
 #include <iostream>
 #include <map>
@@ -110,9 +111,9 @@ void c_print(const std::string text, const std::string color) {
         g = 165;
         b = 0;
     } else if (color == "purple") {
-        r = 128;
-        g = 0;
-        b = 128;
+        r = 255;
+        g = 10;
+        b = 255;
     } else if (color == "pink") {
         r = 255;
         g = 105;
@@ -129,6 +130,20 @@ void redraw_terminal() {
     c_print("\n--------JackRoulette--------\n", "white");
 }
 
+// === Random int ===
+int random_int(int min, int max) {
+    static std::mt19937 rng(static_cast<unsigned>(
+        std::chrono::steady_clock::now().time_since_epoch().count()));
+    std::uniform_int_distribution<int> dist(min, max);
+    return dist(rng);
+}
+
+// === To lower ===
+std::string to_lower(const std::string& str) {
+    std::string lower = std::tolower(str);
+    return lower;
+}
+
 // === Prompt Continue ===
 void prompt_continue() {
     // Empty for now
@@ -138,37 +153,66 @@ void prompt_continue() {
 void item_activate(const std::string& item) {
     // Empty for now
 }
+std::pair<std::string, int> open_shop(int user_money) {
+    std::map<std::string, int> prices;
 
-// === Shop ===
-std::string open_shop(int user_money) {
-    //Empty
-    return "a";
+    std::cout << "\n🛒 Welcome to the Shop! Choose one item to aid your next bet.\n";
+    for (int i = 0; i < ITEM_COUNT; ++i) {
+        int modifier = random_int(-10, 10);
+        int final_price = std::max(1, static_cast<int>(ITEM_PRICE_FRACTIONS[i] * user_money + modifier));
+        std::string item_name = ITEM_NAMES[i];
+        std::string lower_name = to_lower(item_name);
+        prices[lower_name] = final_price;
+
+        std::cout << "\n- " << ITEM_NAMES[i]
+                  << "\n  Effect: " << ITEM_EFFECTS[i]
+                  << "\n  " << ITEM_DESCRIPTIONS[i]
+                  << "\n  💸 Price: $" << final_price << "\n";
+    }
+
+    std::cout << "\nEnter the name of the item you want to buy (or press Enter to skip): ";
+    std::string choice;
+    std::cin.ignore();
+    std::getline(std::cin, choice);
+    std::string lower_choice = to_lower(choice);
+
+    if (lower_choice.empty()) {
+        std::cout << "You walk away empty-handed... for now.\n";
+        return {"N/A", user_money};
+    }
+
+    if (prices.count(lower_choice)) {
+        int price = prices[lower_choice];
+        if (user_money >= price) {
+            user_money -= price;
+            std::cout << "You purchased '" << choice << "' for $" << price << ".\n";
+            return {lower_choice, user_money};
+        } else {
+            std::cout << "You can't afford that. Maybe next round.\n";
+        }
+    } else {
+        std::cout << "That item isn't for sale right now.\n";
+    }
+
+    return {"N/A", user_money};
 }
 
-// === Roulette Spin ===
 int roulette(int bet, const std::string& item) {
-    if (item != "N/A") {
-        // Do something with item
-    }
-
-    int losing_number = 0;
-
-    for (int spin = 0; spin < 50; ++spin) {
-        // Spinning effect
-    }
-
-    bool lost = false;
-
-    if (item == "paranoia charm" && lost) {
-        return 0;
+    int roll = random_int(1, WHEEL_MAX);
+    bool lost = (roll == 1);  // 1 in 4 loss chance
+    if (item == "fortune's favor" && lost) {
+        if (random_int(1, 2) == 1) {
+            lost = false;  // 50% chance to retry
+        }
     }
 
     int earnings = 0;
-
     if (lost) {
-
-    } else{
-
+        earnings = -bet * 2;
+        c_print("The wheel betrays you. You lose $" + std::to_string(-earnings) + "\n", "red");
+    } else {
+        earnings = bet;
+        c_print("The wheel lands in your favor. You win $" + std::to_string(earnings) + "\n", "green");
     }
 
     prompt_continue();
@@ -212,7 +256,11 @@ bool game() {
         std::string item = "N/A";
 
         if (visitShop == "y") {
-            item = open_shop(userMoney);
+            auto result = open_shop(userMoney);
+            item = result.first;
+            userMoney = result.second;
+            redraw_terminal();
+            c_print("You purchased" + item, "cyan");
         } else {
             c_print("You ignore the strange merchant lingering in the corner...", "gray");
             std::this_thread::sleep_for(std::chrono::seconds(2));
