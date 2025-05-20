@@ -4,6 +4,7 @@
 // Date: May 17, 2025
 // Roulette game in C++
 
+#include <algorithm>
 #include <cctype>
 #include <chrono>
 #include <iostream>
@@ -14,7 +15,7 @@
 #include <thread>
 #include <vector>
 
-const std::string CONTINUE_MSG = "Press enter to continue:";
+const std::string CONTINUE_MSG = "Enter any input to continue:";
 const std::string STARTING_MSG = "You've entered a world where chance is king and risk is the price of power.\nStart with a modest sum, claw your way to $1000, and bend fortune to your will...\nIf it doesn't break you first…";
 
 const char* TUTORIAL[] = {
@@ -140,19 +141,32 @@ int random_int(int min, int max) {
 
 // === To lower ===
 std::string to_lower(const std::string& str) {
-    std::string lower = std::tolower(str);
+    std::string lower = str;
+    std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) {
+        return std::tolower(c);
+    });
     return lower;
 }
 
 // === Prompt Continue ===
 void prompt_continue() {
-    // Empty for now
+    for (int counter = 0; counter < CONTINUE_MSG.length();counter++) {
+        c_print(std::string(1, CONTINUE_MSG[counter]), "yellow");
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    std::string input;
+    std::cin >> input;  // Wait for user input
 }
-
 // === Item Activate ===
 void item_activate(const std::string& item) {
-    // Empty for now
+    for (int item_c; item_c < ITEM_NAMES.length(); item_c++) {
+        if (ITEM_NAMES[item_c] == item) {
+            c_print("🜲 " + ITEM_ACTIVATION_LINES[item_c], "blue");
+            break;
+        }
+    }
 }
+
 std::pair<std::string, int> open_shop(int user_money) {
     std::map<std::string, int> prices;
 
@@ -216,6 +230,7 @@ int roulette(int bet, const std::string& item) {
     }
 
     prompt_continue();
+    redraw_terminal();
     return earnings;
 }
 
@@ -259,8 +274,6 @@ bool game() {
             auto result = open_shop(userMoney);
             item = result.first;
             userMoney = result.second;
-            redraw_terminal();
-            c_print("You purchased" + item, "cyan");
         } else {
             c_print("You ignore the strange merchant lingering in the corner...", "gray");
             std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -268,6 +281,9 @@ bool game() {
 
         try {
             redraw_terminal();
+            if (item != "N/A") {
+                c_print("You purchased " + item + "\n", "cyan");
+            }
             c_print(dialogue, "gray");
             c_print("\nYour current money: " + std::to_string(userMoney), "cyan");
 
@@ -295,6 +311,8 @@ bool game() {
             }
         } catch (std::invalid_argument) {
             c_print("Warning: Invalid input detected!", "red");
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            redraw_terminal();
         }
     }
     std::string retry;
@@ -340,8 +358,8 @@ int main() {
     while (retry == true) {
         retry = game();
     }
-    c_print("Farewell friend, may the odds be forever in your favour", "gray");
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    c_print("\nFarewell friend, may the odds be forever in your favour\n", "gray");
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     c_print("And remember, 99% of gamblers quit before they win big...", "gray");
     return 0;
 }
