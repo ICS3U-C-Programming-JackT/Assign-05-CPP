@@ -238,7 +238,7 @@ int roulette(int bet, const std::string item) {
             redraw_terminal();
             item_activate(item);
             std::string avoid_str;
-            std::cout << "Enter a number to avoid: " << std::endl;
+            std::cout << "Enter a number to avoid: ";
             std::cin >> avoid_str;
             int avoid_int;
             try {
@@ -246,6 +246,8 @@ int roulette(int bet, const std::string item) {
                 if (roll == avoid_int) {
                     lost = false;
                     c_print("Your dice shatter, saving your bet for this round", "cyan");
+                    break;
+                } else {
                     break;
                 }
             } catch(const std::invalid_argument) {
