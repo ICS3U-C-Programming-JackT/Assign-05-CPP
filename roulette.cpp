@@ -266,10 +266,10 @@ int roulette(int bet, const std::string item) {
     int earnings = 0;
     // Output based on outcome
     if (lost) {
-        earnings = -bet * 2;
+        earnings = -bet*1.5;
         c_print("The wheel betrays you. You lose $" + std::to_string(-earnings) + "\n", "red");
     } else {
-        earnings = bet;
+        earnings = bet*.5;
         // Echo bet functionality
         if (item == "echo bet") {
             item_activate(item);
